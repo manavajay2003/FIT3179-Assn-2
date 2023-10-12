@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Literacy Rate Visualization for Indian States and Union Territories</title>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+
+<body>
+    <div id="vis"></div>
+    <div id="barChart"></div>
+    <script>
+        var specMap = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "width": 700,
+            "height": 500,
+            "title": "Literacy Rate for Indian States and Union Territories in 2011",
+            "layer": [
+                // Graticules layer
+                {
+                    "data": {
+                        "url": "india_graticule.json", // Replace with the actual path if it's not in the same directory
+                        "format": {
+                            "type": "topojson",
+                            "feature": "india_graticule" // Replace with the actual feature name if it's different
+                        }
+                    },
+                    "mark": {
+                        "type": "geoshape",
+                        "stroke": "#ccc", 
+                        "strokeWidth": 0.5
+                    }
+                },
+                // Indian States layer
+                {
+                    "data": {
+                        "url": "Indian_States.json",
+                        "format": {
+                            "type": "topojson",
+                            "feature": "Indian_States"
+                        }
+                    },
+                    "projection": { "type": "identity", "reflectY": true },
+                    "mark": { "type": "geoshape", "fill": "lightgray", "stroke": "white" }
+                },
+                // Literacy Rate layer
+                {
+                    "data": {
+                        "url": "Indian_States.json",
+                        "format": {
+                            "type": "topojson",
+                            "feature": "Indian_States"
+                        }
+                    },
+                    "transform": [
+                        {
+                            "lookup": "properties.NAME_1",
+                            "from": {
+                                "data": {
+                                    "url": "Table29.6-States-new.csv"
+                                },
+                                "key": "All India/State/Union Territory",
+                                "fields": [
+                                    "2011 - Person"
+                                ]
+                            }
+                        }
+                    ],
+                    "mark": { "type": "geoshape", "stroke": "white" },
+                    "encoding": {
+                        "color": {
+                            "field": "2011 - Person",
+                            "type": "quantitative",
+                            "scale": {
+                                "domain": [70, 95],
+                                "range": ["#FFFFCC", "#01665E"]
+                            },
+                            "legend": {
+                                "title": "Literacy Rate (%)",
+                                "direction": "horizontal",
+                                "gradientLength": 300
+                            }
+                        },
+                        "tooltip": [
+                            {
+                                "field": "properties.NAME_1",
+                                "type": "nominal",
+                                "title": "State/Union Territory"
+                            },
+                            {
+                                "field": "2011 - Person",
+                                "type": "quantitative",
+                                "title": "Literacy Rate (%)"
+                            }
+                        ]
+                    }
+                }
+            ]
+        };
+
+        var barSpec = {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "data": {
+            "url": "Table29.6-States-new.csv"  // Replace with the path to your dataset
+        },
+        "transform": [
+            // Unpivot the dataset from wide to long format
+            {"fold": ["1991 - Male", "1991 - Female", "2001 - Male", "2001 - Female", "2011 - Male", "2011 - Female"]}
+        ],
+        "width": 700,
+        "height": 400,
+        "selection": {
+            "year": {
+                "type": "single",
+                "fields": ["key"],
+                "bind": {
+                    "input": "select",
+                    "options": ["1991 - Male", "1991 - Female", "2001 - Male", "2001 - Female", "2011 - Male", "2011 - Female"],
+                    "name": "Select Year "
+                },
+                "init": {"key": "2011 - Male"}  // Default selection
+            }
+        },
+        "mark": "bar",
+        "encoding": {
+            "x": {
+                "field": "All India/State/Union Territory",
+                "type": "ordinal",
+                "axis": {"title": "State/Union Territory"}
+            },
+            "y": {
+                "field": "value",
+                "type": "quantitative",
+                "axis": {"title": "Literacy Rate"}
+            },
+            "color": {
+                "field": "key",
+                "type": "nominal",
+                "legend": {"title": "Gender"}
+            },
+            "opacity": {
+                "condition": {"selection": "year", "value": 1},
+                "value": 0.2
+
+            },
+        },
+        "tooltip": [
+            {
+                "field": "All India/State/Union Territory",
+                "type": "ordinal",
+                "title": "State/Union Territory"
+            },
+            {
+                "field": "key",
+                "type": "nominal",
+                "title": "Gender & Year"
+            },
+            {
+                "field": "value",
+                "type": "quantitative",
+                "title": "Literacy Rate",
+                "format": ".2f" // Optional: you can format the number displayed
+            }
+        ]
+    };
+
+
+    vegaEmbed('#vis', specMap);
+    vegaEmbed('#barChart', barSpec);
+</script>
+</body>
+</html>
+</html>
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Literacy Rate Visualization for Indian States and Union Territories</title>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+
+<body>
+    <div id="vis"></div>
+    <div id="barChart"></div>
+    <script>
+        var specMap = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "width": 700,
+            "height": 500,
+            "title": "Literacy Rate for Indian States and Union Territories in 2011",
+            "layer": [
+                // Graticules layer
+                {
+                    "data": {
+                        "url": "india_graticule.json", // Replace with the actual path if it's not in the same directory
+                        "format": {
+                            "type": "topojson",
+                            "feature": "india_graticule" // Replace with the actual feature name if it's different
+                        }
+                    },
+                    "mark": {
+                        "type": "geoshape",
+                        "stroke": "#ccc", 
+                        "strokeWidth": 0.5
+                    }
+                },
+                // Indian States layer
+                {
+                    "data": {
+                        "url": "Indian_States.json",
+                        "format": {
+                            "type": "topojson",
+                            "feature": "Indian_States"
+                        }
+                    },
+                    "projection": { "type": "identity", "reflectY": true },
+                    "mark": { "type": "geoshape", "fill": "lightgray", "stroke": "white" }
+                },
+                // Literacy Rate layer
+                {
+                    "data": {
+                        "url": "Indian_States.json",
+                        "format": {
+                            "type": "topojson",
+                            "feature": "Indian_States"
+                        }
+                    },
+                    "transform": [
+                        {
+                            "lookup": "properties.NAME_1",
+                            "from": {
+                                "data": {
+                                    "url": "Table29.6-States-new.csv"
+                                },
+                                "key": "All India/State/Union Territory",
+                                "fields": [
+                                    "2011 - Person"
+                                ]
+                            }
+                        }
+                    ],
+                    "mark": { "type": "geoshape", "stroke": "white" },
+                    "encoding": {
+                        "color": {
+                            "field": "2011 - Person",
+                            "type": "quantitative",
+                            "scale": {
+                                "domain": [70, 95],
+                                "range": ["#FFFFCC", "#01665E"]
+                            },
+                            "legend": {
+                                "title": "Literacy Rate (%)",
+                                "direction": "horizontal",
+                                "gradientLength": 300
+                            }
+                        },
+                        "tooltip": [
+                            {
+                                "field": "properties.NAME_1",
+                                "type": "nominal",
+                                "title": "State/Union Territory"
+                            },
+                            {
+                                "field": "2011 - Person",
+                                "type": "quantitative",
+                                "title": "Literacy Rate (%)"
+                            }
+                        ]
+                    }
+                }
+            ]
+        };
+
+
+        var barSpec = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "data": {
+                "url": "Table29.6-States-new.csv" // Ensure this path is correct
+            },
+            "width": 700,
+            "height": 400,
+            "selection": {
+                "state": {
+                    "type": "single",
+                    "fields": ["All India/State/Union Territory"],
+                    "bind": {
+                        "input": "select",
+                        "options": [
+                            "Andhra Pradesh",
+                            "Arunachal Pradesh",
+                            "Assam",
+                            "Bihar",
+                            "Chhattisgarh",
+                            "Goa",
+                            "Gujarat",
+                            "Haryana",
+                            "Himachal Pradesh",
+                            "Jammu and Kashmir",
+                            "Jharkhand",
+                            "Karnataka",
+                            "Kerala",
+                            "Madhya Pradesh",
+                            "Maharashtra",
+                            "Manipur",
+                            "Meghalaya",
+                            "Mizoram",
+                            "Nagaland",
+                            "Orissa",
+                            "Punjab",
+                            "Rajasthan",
+                            "Sikkim",
+                            "Tamil Nadu",
+                            "Tripura",
+                            "Uttar Pradesh",
+                            "Uttaranchal",
+                            "West Bengal",
+                            "Andaman and Nicobar",
+                            "Delhi"          
+                        ],
+                        "name": "Select State/Union Territory"
+                    },
+                    "init": {"All India/State/Union Territory": "Andhra Pradesh"} // Default selected state
+                }
+            },
+            "transform": [
+                {
+                    "filter": {"selection": "state"}
+                },
+                {
+                    "fold": ["1991 - Persons", "2001 - Persons", "2011 - Person"]
+                },
+                {
+                    "calculate": "slice(datum.key, 0, 4)", // Added this calculate transform
+                    "as": "Year"
+                }   
+            ],
+            "mark": "bar",
+            "encoding": {
+                "x": {
+                    "field": "key",
+                    "type": "ordinal",
+                    "axis": {"title": "Year"},
+                    "scale": {"band": 0.4}
+                },
+                "y": {
+                    "field": "value",
+                    "type": "quantitative",
+                    "axis": {"title": "Literacy Rate"}
+                },
+                "color": {
+                    "field": "key",
+                    "type": "nominal",
+                    "legend": {"title": "Year"}
+                },
+                "tooltip": [
+                    {
+                        "field": "key",
+                        "type": "nominal",
+                        "title": "Year"
+                    },
+                    {
+                        "field": "value",
+                        "type": "quantitative",
+                        "title": "Literacy Rate",
+                        "format": ".2f"
+                    }
+                ]
+            }
+        };
+        vegaEmbed('#vis', specMap);
+        vegaEmbed('#barChart', barSpec);
+    </script>
+</body>
+</html>
